@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fish Tank Water Monitor</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #e0f7fa, #80deea, #4dd0e1);
+      color: #004d40;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    header {
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 3em;
+      color: #006064;
+    }
+
+    .dashboard {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+      max-width: 1200px;
+      padding: 20px;
+    }
+
+    .card {
+      background: linear-gradient(to bottom, #ffffff, #e0f2f1);
+      border-radius: 20px;
+      width: 220px;
+      padding: 30px 20px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      animation: floatCard 2s ease-in-out infinite alternate;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 26px rgba(0, 0, 0, 0.2);
+    }
+
+    @keyframes floatCard {
+      from { transform: translateY(0px); }
+      to { transform: translateY(-10px); }
+    }
+
+    .label {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #00695c;
+    }
+
+    .value {
+      font-size: 26px;
+      font-weight: bold;
+      color: #00796b;
+      margin-bottom: 10px;
+    }
+
+    .status {
+      font-size: 14px;
+      color: #607d8b;
+      margin-top: 10px;
+    }
+
+    .offline {
+      color: red;
+    }
+
+    .online {
+      color: green;
+    }
+
+    footer {
+      margin-top: auto;
+      padding: 20px;
+      font-size: 14px;
+      color: #555;
+      text-align: center;
+    }
+
+    .loading {
+      font-size: 18px;
+      color: #00695c;
+      text-align: center;
+    }
+
+    .loading span {
+      font-weight: bold;
+      color: #00796b;
+    }
+  </style>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
+</head>
+<body>
+
+  <header>
+    <h1>🐠 Fish Tank Water Monitor</h1>
+  </header>
+
+  <div class="dashboard">
+    <div class="card">
+      <div class="label">Temperature</div>
+      <div class="value" id="temp">-- °C</div>
+      <div class="status" id="status-temp">Loading...</div>
+    </div>
+    <div class="card">
+      <div class="label">pH Level</div>
+      <div class="value" id="ph">--</div>
+      <div class="status" id="status-ph">Loading...</div>
+    </div>
+    <div class="card">
+      <div class="label">Turbidity</div>
+      <div class="value" id="turb">--</div>
+      <div class="status" id="status-turb">Loading...</div>
+    </div>
+    <div class="card">
+      <div class="label">Clearness</div>
+      <div class="value" id="clear">--</div>
+      <div class="status" id="status-clear">Loading...</div>
+    </div>
+    <div class="card">
+      <div class="label">TDS</div>
+      <div class="value" id="tds">-- ppm</div>
+      <div class="status" id="status-tds">Loading...</div>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Fish Tank Monitoring | Built with 💧 by Sandaruwan
+  </footer>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA1tsA97Ckhfyn7VBjlVQ5kcbzpHoY6bWg",
+      databaseURL: "https://nadun-watertank-default-rtdb.asia-southeast1.firebasedatabase.app/",
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const sensors = {
+      temp: "/waterQuality/temperature",
+      ph: "/waterQuality/pH",
+      turb: "/waterQuality/turbidity",
+      clear: "/waterQuality/clearness",
+      tds: "/waterQuality/tds"
+    };
+
+    // Function to update the sensor data and status
+    function updateSensorData(id, value) {
+      const element = document.getElementById(id);
+      const statusElement = document.getElementById('status-' + id);
+      
+      if (value === null || value === undefined) {
+        element.textContent = "--";
+        statusElement.textContent = "Offline";
+        statusElement.classList.add('offline');
+      } else {
+        element.textContent = id === "tds" ? ${value} ppm : value;
+        statusElement.textContent = "Online";
+        statusElement.classList.remove('offline');
+        statusElement.classList.add('online');
+      }
+    }
+
+    // Fetch and update sensor data
+    for (const [id, path] of Object.entries(sensors)) {
+      db.ref(path).on("value", snapshot => {
+        updateSensorData(id, snapshot.val());
+      });
+    }
+  </script>
+</body>
+</html>
