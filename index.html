@@ -1,120 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fish Tank Water Monitor</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Project Nemo</title>
+  <!-- Font Awesome for icons -->
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    rel="stylesheet"
+  />
+
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    :root {
+      --bg-light: #f0f4f8;
+      --bg-dark:  #121212;
+      --card-light: #ffffff;
+      --card-dark:  #1e1e1e;
+      --text-light: #222;
+      --text-dark:  #e0f7fa;
+      --accent:    #00bcd4;
     }
 
+    /* ----- Base ----- */
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #e0f7fa, #80deea, #4dd0e1);
-      color: #004d40;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      overflow-x: hidden;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-light);
+      transition: background-color 0.4s, color 0.4s;
+    }
+    body.dark-mode {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
     }
 
-    header {
-      padding: 40px 20px;
+    /* ----- Header ----- */
+    .header {
+      position: relative;
       text-align: center;
+      padding: 1.5rem 1rem 1rem;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 2rem;
     }
 
-    header h1 {
-      font-size: 3em;
-      color: #006064;
+    /* ----- Toggle Switch ----- */
+    .toggle-wrapper {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
     }
 
+    .toggle-switch {
+      position: relative;
+      width: 60px;
+      height: 32px;
+      display: inline-block;
+    }
+    .toggle-switch input {
+      opacity: 0;
+      width: 0; height: 0;
+    }
+
+    /* track */
+    .slider {
+      position: absolute;
+      inset: 0;
+      background-color: #ccc;
+      border-radius: 34px;
+      transition: background-color 0.4s;
+    }
+    /* thumb */
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 24px; height: 24px;
+      left: 4px; top: 4px;
+      background-color: white;
+      border-radius: 50%;
+      transition: transform 0.4s;
+    }
+
+    /* icons always visible */
+    .moon-icon, .sun-icon {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px;
+      pointer-events: none;
+      transition: opacity 0.4s;
+    }
+    .moon-icon { left: 8px; opacity: 1; color: #000; }
+    .sun-icon  { right: 8px; opacity: 0; }
+
+    /* checked = dark mode */
+    input:checked + .slider {
+      background-color: var(--accent);
+    }
+    input:checked + .slider::before {
+      transform: translateX(28px);
+    }
+    input:checked ~ .moon-icon {
+      opacity: 0;
+    }
+    input:checked ~ .sun-icon {
+      opacity: 1;
+      color: #222; /* contrast on accent */
+    }
+
+    /* ----- Dashboard ----- */
     .dashboard {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 30px;
-      max-width: 1200px;
-      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.2rem;
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 1.5rem;
     }
 
     .card {
-      background: linear-gradient(to bottom, #ffffff, #e0f2f1);
-      border-radius: 20px;
-      width: 220px;
-      padding: 30px 20px;
-      text-align: center;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      cursor: pointer;
-      animation: floatCard 2s ease-in-out infinite alternate;
+      background-color: var(--card-light);
+      padding: 1.5rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.05);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      height: 250px;
+      transition: background-color 0.3s;
     }
-
-    .card:hover {
-      transform: scale(1.05);
-      box-shadow: 0 12px 26px rgba(0, 0, 0, 0.2);
-    }
-
-    @keyframes floatCard {
-      from { transform: translateY(0px); }
-      to { transform: translateY(-10px); }
+    body.dark-mode .card {
+      background-color: var(--card-dark);
     }
 
     .label {
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 10px;
-      color: #00695c;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
     }
-
     .value {
-      font-size: 26px;
+      font-size: 2rem;
       font-weight: bold;
-      color: #00796b;
-      margin-bottom: 10px;
     }
-
     .status {
-      font-size: 14px;
-      color: #607d8b;
-      margin-top: 10px;
+      font-size: 0.9rem;
+      margin-top: auto;
     }
+    .offline { color: red; }
+    .online  { color: green; }
 
-    .offline {
-      color: red;
-    }
-
-    .online {
-      color: green;
-    }
-
-    .loading {
-      font-size: 18px;
-      color: #00695c;
-      text-align: center;
-    }
-
-    .loading span {
-      font-weight: bold;
-      color: #00796b;
+    /* ----- Mobile ----- */
+    @media (max-width: 600px) {
+      .header h1 { font-size: 1.5rem; }
+      .dashboard  { padding: 1rem; gap: 1rem; }
+      .card       { padding: 1rem; height: auto; }
     }
   </style>
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
 </head>
-<body>
 
-  <header>
-    <h1>🐠 Fish Tank Water Monitor</h1>
-  </header>
+<body>
+  <div class="header">
+    <h1>🐠 Project Nemo</h1>
+    <div class="toggle-wrapper">
+      <label class="toggle-switch">
+        <input type="checkbox" id="themeToggle">
+        <span class="slider"></span>
+        <i class="fas fa-moon moon-icon"></i>
+        <i class="fas fa-sun  sun-icon"></i>
+      </label>
+    </div>
+  </div>
 
   <div class="dashboard">
     <div class="card">
@@ -144,47 +200,63 @@
     </div>
   </div>
 
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
   <script>
+    // Initialize Firebase
     const firebaseConfig = {
-      apiKey: "AIzaSyA1tsA97Ckhfyn7VBjlVQ5kcbzpHoY6bWg",
-      databaseURL: "https://nadun-watertank-default-rtdb.asia-southeast1.firebasedatabase.app/",
+      apiKey:       "AIzaSyA1tsA97Ckhfyn7VBjlVQ5kcbzpHoY6bWg",
+      databaseURL:  "https://nadun-watertank-default-rtdb.asia-southeast1.firebasedatabase.app/"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    // Sensor paths
     const sensors = {
-      temp: "/waterQuality/temperature",
-      ph: "/waterQuality/pH",
-      turb: "/waterQuality/turbidity",
+      temp:  "/waterQuality/temperature",
+      ph:    "/waterQuality/pH",
+      turb:  "/waterQuality/turbidity",
       clear: "/waterQuality/clearness",
-      tds: "/waterQuality/tds"
+      tds:   "/waterQuality/tds"
     };
 
-    // Function to update the sensor data and status
+    // Update UI
     function updateSensorData(id, value) {
-      const element = document.getElementById(id);
-      const statusElement = document.getElementById('status-' + id);
+      const el = document.getElementById(id);
+      const st = document.getElementById("status-" + id);
 
-      if (value === null || value === undefined) {
-        element.textContent = "--";
-        statusElement.textContent = "Offline";
-        statusElement.classList.remove('online');
-        statusElement.classList.add('offline');
+      if (value == null) {
+        el.textContent = "--";
+        st.textContent = "Offline";
+        st.classList.add("offline");
+        st.classList.remove("online");
       } else {
-        element.textContent = id === "tds" ? `${value} ppm` : value;
-        statusElement.textContent = "Online";
-        statusElement.classList.remove('offline');
-        statusElement.classList.add('online');
+        // Round temp & pH to 2 decimals
+        if (id === "temp" || id === "ph") {
+          value = parseFloat(value).toFixed(2);
+        }
+        el.textContent = id === "tds"
+          ? `${value} ppm`
+          : id === "temp"
+            ? `${value} °C`
+            : value;
+        st.textContent = "Online";
+        st.classList.add("online");
+        st.classList.remove("offline");
       }
     }
 
-    // Fetch and update sensor data
-    for (const [id, path] of Object.entries(sensors)) {
-      db.ref(path).on("value", snapshot => {
-        updateSensorData(id, snapshot.val());
-      });
+    // Listen for realtime updates
+    for (let [id, path] of Object.entries(sensors)) {
+      db.ref(path).on("value", snap => updateSensorData(id, snap.val()));
     }
+
+    // Theme toggle
+    document.getElementById("themeToggle")
+      .addEventListener("change", e => {
+        document.body.classList.toggle("dark-mode", e.target.checked);
+      });
   </script>
 </body>
 </html>
