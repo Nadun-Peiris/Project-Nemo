@@ -1,0 +1,141 @@
+:root {
+    --bg-light: #f0f4f8;
+    --bg-dark:  #121212;
+    --card-light: #ffffff;
+    --card-dark:  #1e1e1e;
+    --text-light: #222;
+    --text-dark:  #e0f7fa;
+    --accent:    #00bcd4;
+}
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-light);
+    transition: background-color 0.4s, color 0.4s;
+}
+body.dark-mode {
+    background-color: var(--bg-dark);
+    color: var(--text-dark);
+}
+
+.header {
+    position: relative;
+    text-align: center;
+    padding: 1.5rem 1rem 1rem;
+}
+.header h1 {
+    margin: 0;
+    font-size: 2rem;
+}
+
+.toggle-wrapper {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+}
+.toggle-switch {
+    position: relative;
+    width: 60px;
+    height: 32px;
+    display: inline-block;
+}
+.toggle-switch input {
+    opacity: 0;
+    width: 0; height: 0;
+}
+.slider {
+    position: absolute;
+    inset: 0;
+    background-color: #ccc;
+    border-radius: 34px;
+    transition: background-color 0.4s;
+}
+.slider::before {
+    content: "";
+    position: absolute;
+    width: 24px; height: 24px;
+    left: 4px; top: 4px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.4s;
+}
+.moon-icon, .sun-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    pointer-events: none;
+    transition: opacity 0.4s;
+}
+.moon-icon { left: 8px; opacity: 1; color: #000; }
+.sun-icon  { right: 8px; opacity: 0; }
+
+input:checked + .slider {
+    background-color: var(--accent);
+}
+input:checked + .slider::before {
+    transform: translateX(28px);
+}
+input:checked ~ .moon-icon { opacity: 0; }
+input:checked ~ .sun-icon  { opacity: 1; color: #222; }
+
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.2rem;
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+}
+
+.card {
+    background-color: var(--card-light);
+    padding: 1.5rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 250px;
+    transition: background-color 0.3s;
+}
+body.dark-mode .card {
+    background-color: var(--card-dark);
+}
+.label {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+.value {
+    font-size: 2rem;
+    font-weight: bold;
+}
+.status {
+    font-size: 0.9rem;
+    margin-top: auto;
+}
+.offline { color: red; }
+.online  { color: green; }
+
+.feeder-bar-container {
+    margin-top: 1rem;
+    height: 24px;
+    background-color: #ccc;
+    border-radius: 12px;
+    overflow: hidden;
+}
+.feeder-bar {
+    height: 100%;
+    width: 0%;
+    background-color: green;
+    transition: width 0.4s ease, background-color 0.4s ease;
+}
+
+@media (max-width: 600px) {
+    .header h1 { font-size: 1.5rem; }
+    .dashboard  { padding: 1rem; gap: 1rem; }
+    .card       { padding: 1rem; height: auto; }
+}
